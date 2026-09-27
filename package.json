@@ -1,0 +1,31 @@
+{
+  "name": "pi-glance",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A compact, readable footer for Pi",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "footer",
+    "statusline"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "pi": {
+    "extensions": [
+      "./extensions/index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2"
+  }
+}
