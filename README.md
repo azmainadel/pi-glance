@@ -18,7 +18,7 @@ From a local clone:
 pi install ~/Developer/pi-glance
 ```
 
-Or from a GitHub repository once published:
+Or from this GitHub repository directly:
 
 ```bash
 pi install git:github.com/azmainadel/pi-glance
