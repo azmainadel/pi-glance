@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { sep } from "node:path";
-import { alignColumns, compactDirectory, formatDirectory, renderLocation } from "../src/layout.ts";
+import { alignColumns, compactDirectory, formatDirectory, renderLocation } from "../src/layout";
 
 const terminal = {
   visibleWidth: (s: string) => Array.from(s.replace(/\x1b\[[0-9;]*m/g, "")).length,

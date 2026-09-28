@@ -21,11 +21,12 @@
     "@earendil-works/pi-tui": "*"
   },
   "scripts": {
-    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "test": "node --import jiti/register --test tests/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^26.6.3",
+    "jiti": "^2.7.0",
     "typescript": "^7.0.2"
   }
 }

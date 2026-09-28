@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { visibleWidth } from "@earendil-works/pi-tui";
-import register from "../extensions/index.ts";
+import register from "../extensions/index";
 
 test("extension registers a footer that renders session, full branch and provider", async () => {
   const handlers = new Map<string, Function>();

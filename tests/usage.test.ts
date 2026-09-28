@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { SessionEntry } from "@earendil-works/pi-coding-agent";
-import { calculateUsage, formatTokens } from "../src/usage.ts";
+import { calculateUsage, formatTokens } from "../src/usage";
 
 const usage = (input: number, output: number, cacheRead = 0, cacheWrite = 0, cost = 0) => ({
   input, output, cacheRead, cacheWrite, cost: { total: cost },

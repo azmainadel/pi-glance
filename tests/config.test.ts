@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { loadProviderAliases, providerLabel } from "../src/config.ts";
+import { loadProviderAliases, providerLabel } from "../src/config";
 
 test("common provider labels and unknown-provider fallback", () => {
   assert.equal(providerLabel("openai-codex"), "codex");
