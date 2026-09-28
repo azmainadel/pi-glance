@@ -23,10 +23,14 @@ export const THINKING_ALIASES: Readonly<Record<string, string>> = {
   xhigh: "xhi",
 };
 
-export function providerLabel(provider: string, overrides: Readonly<Record<string, string>> = {}): string {
+export function providerLabel(
+  provider: string,
+  overrides: Readonly<Record<string, string>> = {},
+): string {
   const key = provider.toLowerCase();
   if (Object.hasOwn(overrides, key)) return overrides[key];
-  if (Object.hasOwn(DEFAULT_PROVIDER_ALIASES, key)) return DEFAULT_PROVIDER_ALIASES[key];
+  if (Object.hasOwn(DEFAULT_PROVIDER_ALIASES, key))
+    return DEFAULT_PROVIDER_ALIASES[key];
   return provider;
 }
 
@@ -50,12 +54,22 @@ export function loadProviderAliases(agentDir: string): Record<string, string> {
   }
   const aliases = (config as Record<string, unknown>).providerAliases;
   if (aliases === undefined) return {};
-  if (typeof aliases !== "object" || aliases === null || Array.isArray(aliases)) {
-    throw new Error("providerAliases must be an object of provider IDs to display names");
+  if (
+    typeof aliases !== "object" ||
+    aliases === null ||
+    Array.isArray(aliases)
+  ) {
+    throw new Error(
+      "providerAliases must be an object of provider IDs to display names",
+    );
   }
   const result: Record<string, string> = Object.create(null);
   for (const [key, value] of Object.entries(aliases)) {
-    if (typeof value !== "string" || !value.trim() || /[\x00-\x1f\x7f]/.test(value)) {
+    if (
+      typeof value !== "string" ||
+      !value.trim() ||
+      /[\x00-\x1f\x7f]/.test(value)
+    ) {
       throw new Error(`Invalid display name for provider ${key}`);
     }
     result[key.toLowerCase()] = value.trim();
