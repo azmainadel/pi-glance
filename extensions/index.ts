@@ -21,9 +21,25 @@ import {
 } from "../src/layout";
 import { calculateUsage, formatTokens } from "../src/usage";
 
+/**
+ * Pi does not expose the live compaction setting to extension contexts, so we
+ * re-read the saved effective settings from a timer. Reading is off the render
+ * path; render() only reads the cached boolean.
+ */
+const SETTINGS_REFRESH_MS = 2000;
+
+function readAutoCompactionEnabled(cwd: string, projectTrusted: boolean): boolean {
+  return SettingsManager.create(cwd, getAgentDir(), { projectTrusted })
+    .getCompactionEnabled();
+}
+
 export default function (pi: ExtensionAPI) {
   pi.on("session_start", async (_event, ctx) => {
     if (ctx.mode !== "tui") return;
+
+    const cwd = ctx.sessionManager.getCwd();
+    const projectTrusted = ctx.isProjectTrusted();
+    let autoCompactEnabled = readAutoCompactionEnabled(cwd, projectTrusted);
 
     let providerAliases: Record<string, string> = {};
     try {
@@ -35,10 +51,19 @@ export default function (pi: ExtensionAPI) {
     ctx.ui.setFooter((tui, theme, footerData) => {
       const unsubscribe = footerData.onBranchChange(() => tui.requestRender());
       const terminal = { truncateToWidth, visibleWidth, wrapTextWithAnsi };
-      let autoCompactEnabled: boolean | undefined;
-      let nextSettingsCheck = 0;
+      const settingsTimer = setInterval(() => {
+        try {
+          autoCompactEnabled = readAutoCompactionEnabled(cwd, projectTrusted);
+        } catch {
+          // Keep the last known value; /settings is validated by Pi itself.
+        }
+      }, SETTINGS_REFRESH_MS);
+      settingsTimer.unref?.();
       return {
-        dispose: unsubscribe,
+        dispose() {
+          clearInterval(settingsTimer);
+          unsubscribe();
+        },
         invalidate() {},
         render(width: number): string[] {
           const tokens = calculateUsage(ctx.sessionManager.getEntries());
@@ -53,19 +78,6 @@ export default function (pi: ExtensionAPI) {
               ? `${context.percent.toFixed(1)}% / ${formatTokens(context.contextWindow)}`
               : "context n/a";
 
-          // Pi does not expose the live setting to extensions. Check the saved
-          // effective setting at most once per second, not on every TUI render.
-          if (
-            autoCompactEnabled === undefined ||
-            Date.now() >= nextSettingsCheck
-          ) {
-            autoCompactEnabled = SettingsManager.create(
-              ctx.sessionManager.getCwd(),
-              getAgentDir(),
-              { projectTrusted: ctx.isProjectTrusted() },
-            ).getCompactionEnabled();
-            nextSettingsCheck = Date.now() + 1000;
-          }
           const location = renderLocation(
             {
               dir: formatDirectory(ctx.sessionManager.getCwd(), homedir()),
@@ -78,8 +90,8 @@ export default function (pi: ExtensionAPI) {
             },
             terminal,
             {
-              dim: (text) => theme.fg("dim", text),
-              session: (text) => {
+              dim: (text: string) => theme.fg("dim", text),
+              session: (text: string) => {
                 const gold =
                   theme.getColorMode() === "truecolor"
                     ? "\x1b[38;2;181;158;101m"
