@@ -1,10 +1,10 @@
 # Pi Glance
 
-A compact, low-contrast, three-line footer for [Pi](https://pi.dev). Shows the current directory and Git branch, session name (soft gold, right-aligned), session token totals and latest request cache hit, context usage, model, and Pi Lens LSP status when available.
+A compact, low-contrast, three-line footer for [Pi](https://pi.dev). Shows the current directory and Git branch, session name (soft gold, right-aligned), session token totals, context usage, model, and Pi Lens LSP status when available.
 
 ```text
 ~/Developer/project (feature/my-branch)                              my session
-✨ ↑41k ↓2.3k ♻️ 274k 🎯 97.6% 💰 $0.008       🧠 7.9% / 272k (auto)
+✨ ↑41k ↓2.3k ♻️ 274k 💰 $0.008                     🧠 7.9% / 272k (auto)
 🧩 LSP Inactive                                      codex · gpt-6-luna · med
 ```
 
@@ -46,7 +46,7 @@ Keys match Pi provider IDs (case-insensitive). Changes take effect after `/reloa
 ## Reading the footer
 
 - `↑` / `↓`: cumulative input/output tokens for **all persisted session entries**, including compactions and tool/summarization usage.
-- `♻️`: cumulative cached input tokens. `W` appears if there are cache-write tokens. `🎯`: cache-hit rate of the **latest assistant request** (not the cumulative average).
+- `♻️`: cumulative cached input tokens. `W` appears if there are cache-write tokens.
 - `💰`: Pi's estimated session cost; it can differ from your actual subscription bill.
 - `🧠`: current estimated context/window; `(auto)` appears when automatic compaction is enabled in the saved effective settings. Pi does not expose this live setting to extension contexts, so Pi Glance re-reads the saved settings on a 2s timer instead of on every render; the display may briefly lag after changes in `/settings`.
 - Provider label, model ID, and thinking level are display-only. `med`, `hi`, and `xhi` abbreviate Pi's levels.
@@ -54,7 +54,6 @@ Keys match Pi provider IDs (case-insensitive). Changes take effect after `/reloa
 
 ## Common questions
 
-- **Why does `🎯` differ wildly from my average?** It is the cache-hit rate of the most recent assistant request only. A single uncached turn drops it; that is expected, not a bug.
 - **Why is `💰` not my bill?** It is Pi's own estimate of session cost. Subscriptions, enterprise rates, and rounding are not reflected.
 - **Why do my token totals grow after a compaction?** `↑`/`↓`/`♻️` sum every persisted entry, including compaction and summarization calls. They are a session-lifetime total, not the current context.
 - **Why does `(auto)` lag for a second after I change `/settings`?** Pi does not expose the live setting to extensions. Pi Glance re-reads the saved settings on a timer, so the footer can briefly be stale.

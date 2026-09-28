@@ -16,16 +16,7 @@ test("totals include all persisted usage, including tools and summaries", () => 
     entry({ type: "compaction", usage: usage(4, 5, 0, 0, 0.03) }),
     entry({ type: "branch_summary", usage: usage(6, 7, 0, 0, 0.04) }),
   ]);
-  assert.deepEqual(result, { input: 24, output: 15, cacheRead: 32, cacheWrite: 10, cost: 0.2, latestCacheHit: 60 });
-});
-
-test("cache-hit percentage is from latest assistant request, not session totals", () => {
-  const result = calculateUsage([
-    entry({ type: "message", message: { role: "assistant", usage: usage(0, 0, 90, 10) } }),
-    entry({ type: "message", message: { role: "assistant", usage: usage(20, 1, 5, 5) } }),
-  ]);
-  assert.equal(result.latestCacheHit, 5 / 30 * 100);
-  assert.equal(calculateUsage([]).latestCacheHit, undefined);
+  assert.deepEqual(result, { input: 24, output: 15, cacheRead: 32, cacheWrite: 10, cost: 0.2 });
 });
 
 test("token formatting follows Pi thresholds", () => {

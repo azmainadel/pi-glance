@@ -6,22 +6,26 @@ export interface UsageStats {
   cacheRead: number;
   cacheWrite: number;
   cost: number;
-  /** Cache hit rate of the most recent assistant request (not an aggregate). */
-  latestCacheHit?: number;
 }
 
-/** Mirrors Pi's default footer: cumulative entries, latest assistant cache hit. */
+/** Mirrors Pi's default footer: cumulative totals across all persisted entries. */
 export function calculateUsage(entries: readonly SessionEntry[]): UsageStats {
-  const totals: UsageStats = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, cost: 0 };
+  const totals: UsageStats = {
+    input: 0,
+    output: 0,
+    cacheRead: 0,
+    cacheWrite: 0,
+    cost: 0,
+  };
   for (const entry of entries) {
     let usage;
     if (entry.type === "usage") usage = entry.usage;
-    else if (entry.type === "message" && entry.message.role === "assistant") {
+    else if (entry.type === "message" && entry.message.role === "assistant")
       usage = entry.message.usage;
-      const prompt = usage.input + usage.cacheRead + usage.cacheWrite;
-      totals.latestCacheHit = prompt > 0 ? (usage.cacheRead / prompt) * 100 : undefined;
-    } else if (entry.type === "message" && entry.message.role === "toolResult") usage = entry.message.usage;
-    else if (entry.type === "branch_summary" || entry.type === "compaction") usage = entry.usage;
+    else if (entry.type === "message" && entry.message.role === "toolResult")
+      usage = entry.message.usage;
+    else if (entry.type === "branch_summary" || entry.type === "compaction")
+      usage = entry.usage;
     if (!usage) continue;
     totals.input += usage.input;
     totals.output += usage.output;

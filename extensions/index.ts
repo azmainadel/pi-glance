@@ -111,10 +111,6 @@ export default function (pi: ExtensionAPI) {
               ...(tokens.cacheWrite
                 ? [`W${formatTokens(tokens.cacheWrite)}`]
                 : []),
-              ...(tokens.latestCacheHit !== undefined &&
-              (tokens.cacheRead || tokens.cacheWrite)
-                ? [`🎯 ${tokens.latestCacheHit.toFixed(1)}%`]
-                : []),
               "💰",
               `$${tokens.cost.toFixed(3)}`,
             ].join(" "),
