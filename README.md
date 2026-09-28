@@ -48,9 +48,18 @@ Keys match Pi provider IDs (case-insensitive). Changes take effect after `/reloa
 - `↑` / `↓`: cumulative input/output tokens for **all persisted session entries**, including compactions and tool/summarization usage.
 - `♻️`: cumulative cached input tokens. `W` appears if there are cache-write tokens. `🎯`: cache-hit rate of the **latest assistant request** (not the cumulative average).
 - `💰`: Pi's estimated session cost; it can differ from your actual subscription bill.
-- `🧠`: current estimated context/window; `(auto)` appears when automatic compaction is enabled in the saved effective settings. Pi does not expose this live setting to extension contexts, so Pi Glance checks the saved setting at most once per second; the display may briefly lag after changes in `/settings`.
+- `🧠`: current estimated context/window; `(auto)` appears when automatic compaction is enabled in the saved effective settings. Pi does not expose this live setting to extension contexts, so Pi Glance re-reads the saved settings on a 2s timer instead of on every render; the display may briefly lag after changes in `/settings`.
 - Provider label, model ID, and thinking level are display-only. `med`, `hi`, and `xhi` abbreviate Pi's levels.
 - `🧩`: Pi Lens LSP status if published; otherwise it says `LSP status unavailable`—not `Inactive`.
+
+## Common questions
+
+- **Why does `🎯` differ wildly from my average?** It is the cache-hit rate of the most recent assistant request only. A single uncached turn drops it; that is expected, not a bug.
+- **Why is `💰` not my bill?** It is Pi's own estimate of session cost. Subscriptions, enterprise rates, and rounding are not reflected.
+- **Why do my token totals grow after a compaction?** `↑`/`↓`/`♻️` sum every persisted entry, including compaction and summarization calls. They are a session-lifetime total, not the current context.
+- **Why does `(auto)` lag for a second after I change `/settings`?** Pi does not expose the live setting to extensions. Pi Glance re-reads the saved settings on a timer, so the footer can briefly be stale.
+- **Why does the branch disappear?** It is never truncated — it moves to its own row, wrapping as needed. On a very narrow terminal even that is clipped, so widen the window or shorten the branch.
+- **Is `🧩 LSP Inactive` the same as `LSP status unavailable`?** No. `Inactive` is Pi Lens reporting a stopped language server. `LSP status unavailable` means Pi Lens is not installed or not running, so Pi Glance has nothing to read.
 
 ## Development
 
@@ -61,7 +70,7 @@ npm run typecheck
 pi --no-extensions -e ./extensions/index.ts
 ```
 
-The extension entry lives in `extensions/index.ts`; `src/usage.ts`, `src/layout.ts`, and `src/config.ts` hold the testable accounting, terminal layout, and provider aliases. Tests use Node's built-in test runner (Node 22+). Pi provides its runtime packages; they are peer dependencies rather than bundled libraries.
+The extension entry lives in `extensions/index.ts`; `src/usage.ts`, `src/layout.ts`, and `src/config.ts` hold the testable accounting, terminal layout, and provider aliases. Relative imports are extensionless, matching how Pi's jiti-based loader resolves the extension. Tests use Node's built-in runner through `jiti/register` (Node 22+), so they exercise the same resolution the TUI does. Pi provides its runtime packages; they are peer dependencies rather than bundled libraries.
 
 ## License
 
